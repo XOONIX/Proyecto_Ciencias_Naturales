@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estequiometría Química</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #060d0f;
+    --panel:     #0b1a1e;
+    --border:    #1a3a42;
+    --accent:    #00e5c8;
+    --accent2:   #ff7b00;
+    --accent3:   #7cf542;
+    --text:      #c8e8ec;
+    --muted:     #4a7a84;
+    --danger:    #ff4466;
+    --mono:      'Share Tech Mono', monospace;
+    --display:   'Orbitron', sans-serif;
+    --body:      'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Grid background ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,200,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,200,.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Glow orbs ── */
+  body::after {
+    content: '';
+    position: fixed;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,229,200,.06) 0%, transparent 70%);
+    top: -100px; left: -100px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative; z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── Header ── */
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeDown .6s ease both;
+  }
+  .logo-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: .7;
+  }
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(22px, 5vw, 38px);
+    font-weight: 900;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--accent) 0%, #00b8a9 50%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp .5s ease both;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: .5;
+  }
+  .card-title {
+    font-family: var(--display);
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Inputs ── */
+  .field {
+    margin-bottom: 18px;
+  }
+  label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-family: var(--mono);
+  }
+  input[type="text"], input[type="number"], select {
+    width: 100%;
+    background: rgba(0,0,0,.4);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  input[type="text"]:focus, input[type="number"]:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,229,200,.1);
+  }
+  select option { background: #0b1a1e; }
+
+  /* ── Row layout ── */
+  .row { display: flex; gap: 16px; }
+  .row .field { flex: 1; }
+
+  /* ── Parse result ── */
+  #eq-display {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: rgba(0,229,200,.05);
+    border: 1px solid rgba(0,229,200,.15);
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 14px;
+    display: none;
+  }
+  #eq-display .side-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  #eq-display .compound {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0,0,0,.3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    margin: 3px;
+    font-size: 13px;
+  }
+  #eq-display .coef {
+    color: var(--accent2);
+    font-weight: bold;
+  }
+  #eq-display .formula { color: var(--accent); }
+  #eq-display .arrow {
+    color: var(--muted);
+    font-size: 20px;
+    margin: 0 8px;
+    vertical-align: middle;
+  }
+
+  /* ── Compound selector ── */
+  .compound-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .compound-btn {
+    background: rgba(0,0,0,.3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all .2s;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text);
+    position: relative;
+  }
+  .compound-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .compound-btn.selected-known {
+    border-color: var(--accent2);
+    background: rgba(255,123,0,.1);
+    color: var(--accent2);
+    box-shadow: 0 0 12px rgba(255,123,0,.2);
+  }
+  .compound-btn.selected-unknown {
+    border-color: var(--accent);
+    background: rgba(0,229,200,.1);
+    color: var(--accent);
+    box-shadow: 0 0 12px rgba(0,229,200,.2);
+  }
+  .compound-btn .coef-tag {
+    font-size: 10px;
+    opacity: .6;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .compound-btn .side-tag {
+    font-size: 9px;
+    letter-spacing: 1px;
+    opacity: .5;
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .dot.known  { background: var(--accent2); }
+  .dot.unknown { background: var(--accent); }
+
+  /* ── Button ── */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(0,229,200,.15), rgba(0,229,200,.05));
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    font-family: var(--display);
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all .25s;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+  .btn:hover {
+    background: rgba(0,229,200,.2);
+    box-shadow: 0 0 24px rgba(0,229,200,.25);
+    transform: translateY(-1px);
+  }
+  .btn:active { transform: translateY(0); }
+
+  /* ── Error ── */
+  .error-box {
+    background: rgba(255,68,102,.1);
+    border: 1px solid rgba(255,68,102,.4);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--danger);
+    font-family: var(--mono);
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ── Results panel ── */
+  #results {
+    display: none;
+    animation: fadeUp .5s ease both;
+  }
+
+  /* Molar mass table */
+  .molar-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .molar-table th {
+    text-align: left;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .molar-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(26,58,66,.5);
+    vertical-align: middle;
+  }
+  .molar-table tr:last-child td { border-bottom: none; }
+  .molar-table .elem-tag {
+    display: inline-block;
+    background: rgba(0,229,200,.08);
+    border: 1px solid rgba(0,229,200,.2);
+    border-radius: 4px;
+    padding: 1px 7px;
+    color: var(--accent);
+    margin: 1px;
+    font-size: 12px;
+  }
+  .molar-table .mass-val { color: var(--accent2); }
+  .molar-table .total-row td {
+    background: rgba(0,229,200,.05);
+    color: var(--accent);
+    font-weight: bold;
+    border-top: 1px solid rgba(0,229,200,.2);
+  }
+
+  /* Steps */
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--display);
+    font-size: 12px;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+  .step-body { flex: 1; }
+  .step-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: var(--mono);
+    margin-bottom: 6px;
+  }
+  .step-formula {
+    background: rgba(0,0,0,.3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .step-formula .hl-orange { color: var(--accent2); }
+  .step-formula .hl-green  { color: var(--accent3); }
+  .step-formula .hl-cyan   { color: var(--accent); }
+  .step-formula .hl-muted  { color: var(--muted); }
+
+  /* Final answer */
+  .answer-box {
+    background: linear-gradient(135deg, rgba(0,229,200,.08), rgba(0,0,0,0));
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 24px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .answer-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,229,200,.1), transparent 70%);
+  }
+  .answer-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: var(--mono);
+    margin-bottom: 10px;
+  }
+  .answer-formula {
+    font-family: var(--mono);
+    font-size: 18px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .answer-value {
+    font-family: var(--display);
+    font-size: clamp(28px, 6vw, 48px);
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+  .answer-unit {
+    font-size: 20px;
+    color: var(--accent2);
+    margin-left: 6px;
+  }
+  .answer-sub {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--mono);
+    margin-top: 8px;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeDown {
+    from { opacity:0; transform: translateY(-20px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(20px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .row { flex-direction: column; }
+    .card { padding: 20px 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-tag">⚗ Laboratorio Virtual</div>
+    <h1>ESTEQUIOMETRÍA<br>QUÍMICA</h1>
+    <p class="subtitle">Cálculo de masas · Pesos atómicos · Moles</p>
+  </header>
+
+  <!-- PASO 1: Ecuación -->
+  <div class="card" style="animation-delay:.1s">
+    <div class="card-title">01 — Ecuación balanceada</div>
+    <div class="field">
+      <label>Ingresa la ecuación balanceada</label>
+      <input type="text" id="eq-input"
+        placeholder="Ej: 2H2 + O2 -> 2H2O  |  CH4 + 2O2 -> CO2 + 2H2O"
+        autocomplete="off">
+    </div>
+    <div id="eq-display"></div>
+    <div id="eq-error" class="error-box"></div>
+    <button class="btn" onclick="parsearEcuacion()">⟳  Analizar Ecuación</button>
+  </div>
+
+  <!-- PASO 2: Selección -->
+  <div class="card" id="step2" style="display:none; animation-delay:.2s">
+    <div class="card-title">02 — Selección de compuestos</div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="dot known"></div> Conocido (masa ingresada)</div>
+      <div class="legend-item"><div class="dot unknown"></div> Desconocido (masa a calcular)</div>
+    </div>
+
+    <p style="font-size:12px; color:var(--muted); font-family:var(--mono); margin-bottom:12px;">
+      Haz clic en el compuesto que <span style="color:var(--accent2)">CONOCES</span>, luego en el que quieres <span style="color:var(--accent)">CALCULAR</span>:
+    </p>
+
+    <div class="compound-grid" id="compound-grid"></div>
+
+    <div id="selection-info" style="margin-top:16px; font-family:var(--mono); font-size:12px; color:var(--muted); min-height:20px;"></div>
+
+    <div class="row" style="margin-top:16px;">
+      <div class="field">
+        <label>Masa del compuesto conocido</label>
+        <input type="number" id="masa-input" min="0.0001" step="any" placeholder="Ej: 36.0">
+      </div>
+      <div class="field">
+        <label>Unidad de masa</label>
+        <select id="unidad-select">
+          <option value="g">Gramos (g)</option>
+          <option value="kg">Kilogramos (kg)</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn" onclick="calcular()">⟶  Calcular Estequiometría</button>
+    <div id="calc-error" class="error-box"></div>
+  </div>
+
+  <!-- Resultados -->
+  <div id="results">
+
+    <!-- Masas molares -->
+    <div class="card" style="animation-delay:.0s">
+      <div class="card-title">Pesos atómicos y masas molares</div>
+      <div id="molar-tables"></div>
+    </div>
+
+    <!-- Pasos -->
+    <div class="card" style="animation-delay:.1s">
+      <div class="card-title">Procedimiento estequiométrico</div>
+      <div id="steps-container"></div>
+    </div>
+
+    <!-- Respuesta -->
+    <div class="card" style="animation-delay:.2s">
+      <div class="card-title">Resultado final</div>
+      <div class="answer-box" id="answer-box"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// PESOS ATÓMICOS (g/mol)
+// ═══════════════════════════════════════════════════════
+const ATOMIC_WEIGHTS = {
+  H:1.008, He:4.003, Li:6.941, Be:9.012, B:10.811, C:12.011, N:14.007,
+  O:15.999, F:18.998, Ne:20.180, Na:22.990, Mg:24.305, Al:26.982, Si:28.086,
+  P:30.974, S:32.065, Cl:35.453, Ar:39.948, K:39.098, Ca:40.078, Sc:44.956,
+  Ti:47.867, V:50.942, Cr:51.996, Mn:54.938, Fe:55.845, Co:58.933, Ni:58.693,
+  Cu:63.546, Zn:65.38,  Ga:69.723, Ge:72.630, As:74.922, Se:78.971, Br:79.904,
+  Kr:83.798, Rb:85.468, Sr:87.62,  Y:88.906,  Zr:91.224, Nb:92.906, Mo:95.96,
+  Tc:98,     Ru:101.07, Rh:102.91, Pd:106.42, Ag:107.87, Cd:112.41, In:114.82,
+  Sn:118.71, Sb:121.76, Te:127.60, I:126.90,  Xe:131.29, Cs:132.91, Ba:137.33,
+  La:138.91, Ce:140.12, Pr:140.91, Nd:144.24, Pm:145,    Sm:150.36, Eu:151.96,
+  Gd:157.25, Tb:158.93, Dy:162.50, Ho:164.93, Er:167.26, Tm:168.93, Yb:173.05,
+  Lu:174.97, Hf:178.49, Ta:180.95, W:183.84,  Re:186.21, Os:190.23, Ir:192.22,
+  Pt:195.08, Au:196.97, Hg:200.59, Tl:204.38, Pb:207.2,  Bi:208.98, Po:209,
+  At:210,    Rn:222,    Fr:223,    Ra:226,    Ac:227,    Th:232.04, Pa:231.04,
+  U:238.03,  Np:237,    Pu:244
+};
+
+// ═══════════════════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════════════════
+let compuestos = [];          // [{coef, formula, side}]
+let selectedKnown   = null;   // índice
+let selectedUnknown = null;   // índice
+
+// ═══════════════════════════════════════════════════════
+// 1. PARSEAR FÓRMULA → {elem: count}
+// ═══════════════════════════════════════════════════════
+function parseFormula(formula) {
+  const re = /([A-Z][a-z]?)(\d*)/g;
+  const elems = {};
+  let m;
+  while ((m = re.exec(formula)) !== null) {
+    if (!m[1]) continue;
+    const e = m[1], n = parseInt(m[2] || '1');
+    elems[e] = (elems[e] || 0) + n;
+  }
+  return elems;
+}
+
+// ═══════════════════════════════════════════════════════
+// 2. PARSEAR ECUACIÓN COMPLETA
+// ═══════════════════════════════════════════════════════
+function parseEquation(raw) {
+  const eq = raw.replace(/\s+/g, '');
+  let sep = '->';
+  if (!eq.includes('->') && eq.includes('=')) sep = '=';
+  else if (!eq.includes('->') && eq.includes('→')) sep = '→';
+  if (!eq.includes(sep)) throw new Error("Usa '->' o '=' como separador. Ej: H2+O2->H2O");
+
+  const [lhs, rhs] = eq.split(sep);
+  const result = [];
+
+  const parseSide = (str, side) => {
+    str.split('+').forEach(part => {
+      const m = part.match(/^(\d*)([A-Z].*)$/);
+      if (!m) throw new Error(`Compuesto inválido: "${part}"`);
+      const coef = parseInt(m[1] || '1');
+      const formula = m[2];
+      const elems = parseFormula(formula);
+      if (Object.keys(elems).length === 0) throw new Error(`Fórmula vacía: "${formula}"`);
+      // Verificar elementos conocidos
+      for (const e of Object.keys(elems)) {
+        if (!ATOMIC_WEIGHTS[e]) throw new Error(`Elemento desconocido: "${e}"`);
+      }
+      result.push({ coef, formula, side, elems });
+    });
+  };
+
+  parseSide(lhs, 'reactivo');
+  parseSide(rhs, 'producto');
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════
+// 3. VERIFICAR BALANCE
+// ═══════════════════════════════════════════════════════
+function checkBalance(compounds) {
+  const left = {}, right = {};
+  compounds.forEach(({ coef, elems, side }) => {
+    const target = side === 'reactivo' ? left : right;
+    for (const [e, n] of Object.entries(elems)) {
+      target[e] = (target[e] || 0) + coef * n;
+    }
+  });
+  for (const e of Object.keys(left)) {
+    if ((left[e] || 0) !== (right[e] || 0)) return false;
+  }
+  for (const e of Object.keys(right)) {
+    if ((left[e] || 0) !== (right[e] || 0)) return false;
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════
+// 4. MASA MOLAR
+// ═══════════════════════════════════════════════════════
+function molarMass(elems) {
+  let m = 0;
+  for (const [e, n] of Object.entries(elems)) {
+    m += ATOMIC_WEIGHTS[e] * n;
+  }
+  return m;
+}
+
+// ═══════════════════════════════════════════════════════
+// 5. RENDERIZAR EQ DISPLAY
+// ═══════════════════════════════════════════════════════
+function renderEqDisplay(compounds) {
+  const disp = document.getElementById('eq-display');
+  let html = '<div>';
+  let prevSide = null;
+  compounds.forEach((c, i) => {
+    if (prevSide && prevSide !== c.side) {
+      html += '<span class="arrow">→</span>';
+    } else if (i > 0) {
+      html += '<span style="color:var(--muted); margin:0 4px; font-size:18px;">+</span>';
+    }
+    html += `<span class="compound">
+      <span class="coef">${c.coef > 1 ? c.coef : ''}</span>
+      <span class="formula">${c.formula}</span>
+      <span style="font-size:10px;color:var(--muted);margin-left:4px;">[${c.side[0].toUpperCase()}]</span>
+    </span>`;
+    prevSide = c.side;
+  });
+  html += '</div>';
+  disp.innerHTML = html;
+  disp.style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════════════
+// 6. PARSEAR ECUACIÓN (botón)
+// ═══════════════════════════════════════════════════════
+function parsearEcuacion() {
+  const raw = document.getElementById('eq-input').value.trim();
+  const errBox = document.getElementById('eq-error');
+  errBox.style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('step2').style.display = 'none';
+
+  if (!raw) { showErr(errBox, 'Ingresa una ecuación.'); return; }
+
+  try {
+    compuestos = parseEquation(raw);
+  } catch(e) {
+    showErr(errBox, '⚠ ' + e.message); return;
+  }
+
+  if (!checkBalance(compuestos)) {
+    showErr(errBox, '⚠ La ecuación no está balanceada. Revisa los coeficientes.'); return;
+  }
+
+  renderEqDisplay(compuestos);
+  renderCompoundGrid();
+  selectedKnown = null; selectedUnknown = null;
+  document.getElementById('step2').style.display = 'block';
+  document.getElementById('selection-info').textContent = 'Selecciona el compuesto conocido (naranja).';
+  document.getElementById('masa-input').value = '';
+}
+
+// ═══════════════════════════════════════════════════════
+// 7. GRID DE COMPUESTOS
+// ═══════════════════════════════════════════════════════
+function renderCompoundGrid() {
+  const grid = document.getElementById('compound-grid');
+  grid.innerHTML = '';
+  compuestos.forEach((c, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'compound-btn';
+    btn.id = `cbtn-${i}`;
+    btn.innerHTML = `
+      <span class="coef-tag">coef: ${c.coef}</span>
+      ${c.formula}
+      <span class="side-tag">${c.side}</span>`;
+    btn.onclick = () => selectCompound(i);
+    grid.appendChild(btn);
+  });
+}
+
+function selectCompound(i) {
+  if (selectedKnown === null) {
+    selectedKnown = i;
+    document.getElementById(`cbtn-${i}`).className = 'compound-btn selected-known';
+    document.getElementById('selection-info').innerHTML =
+      `<span style="color:var(--accent2)">Conocido: ${compuestos[i].formula}</span> · Ahora selecciona el compuesto a calcular (azul).`;
+    return;
+  }
+  if (i === selectedKnown) {
+    // Deselect
+    document.getElementById(`cbtn-${i}`).className = 'compound-btn';
+    selectedKnown = null; selectedUnknown = null;
+    document.getElementById('selection-info').textContent = 'Selecciona el compuesto conocido (naranja).';
+    return;
+  }
+  if (selectedUnknown !== null) {
+    document.getElementById(`cbtn-${selectedUnknown}`).className = 'compound-btn';
+  }
+  selectedUnknown = i;
+  document.querySelectorAll('.compound-btn.selected-unknown').forEach(b => {
+    b.className = 'compound-btn';
+  });
+  document.getElementById(`cbtn-${i}`).className = 'compound-btn selected-unknown';
+  document.getElementById('selection-info').innerHTML =
+    `<span style="color:var(--accent2)">Conocido: ${compuestos[selectedKnown].formula}</span>  ·  ` +
+    `<span style="color:var(--accent)">Calcular: ${compuestos[i].formula}</span>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// 8. CALCULAR
+// ═══════════════════════════════════════════════════════
+function calcular() {
+  const errBox = document.getElementById('calc-error');
+  errBox.style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+
+  if (selectedKnown === null)   { showErr(errBox, 'Selecciona el compuesto conocido.'); return; }
+  if (selectedUnknown === null) { showErr(errBox, 'Selecciona el compuesto a calcular.'); return; }
+
+  const masaRaw = parseFloat(document.getElementById('masa-input').value);
+  if (!masaRaw || masaRaw <= 0) { showErr(errBox, 'Ingresa una masa válida mayor a 0.'); return; }
+
+  const unidad = document.getElementById('unidad-select').value;
+  const masaGramos = unidad === 'kg' ? masaRaw * 1000 : masaRaw;
+
+  const cK = compuestos[selectedKnown];
+  const cU = compuestos[selectedUnknown];
+
+  const mmK = molarMass(cK.elems);
+  const mmU = molarMass(cU.elems);
+
+  const molesK  = masaGramos / mmK;
+  const molesU  = molesK * (cU.coef / cK.coef);
+  const masaU_g = molesU * mmU;
+  const masaU_kg = masaU_g / 1000;
+
+  // Render
+  renderMolarTables(cK, cU, mmK, mmU);
+  renderSteps(cK, cU, mmK, mmU, masaRaw, unidad, masaGramos, molesK, molesU, masaU_g);
+  renderAnswer(cU, masaU_g, masaU_kg, molesU, unidad);
+
+  document.getElementById('results').style.display = 'block';
+  setTimeout(() => {
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+}
+
+// ═══════════════════════════════════════════════════════
+// 9. RENDER MOLAR TABLES
+// ═══════════════════════════════════════════════════════
+function renderMolarTables(cK, cU, mmK, mmU) {
+  const div = document.getElementById('molar-tables');
+  div.innerHTML = buildMolarTable(cK, mmK, 'var(--accent2)') +
+                  buildMolarTable(cU, mmU, 'var(--accent)');
+}
+
+function buildMolarTable(c, mm, color) {
+  let rows = '';
+  for (const [e, n] of Object.entries(c.elems)) {
+    const w = ATOMIC_WEIGHTS[e];
+    const sub = n > 1 ? `<sub style="font-size:10px">${n}</sub>` : '';
+    rows += `<tr>
+      <td><span class="elem-tag">${e}</span>${sub}</td>
+      <td style="color:var(--muted)">${w} g/mol</td>
+      <td>× ${n}</td>
+      <td class="mass-val">${(w * n).toFixed(3)} g/mol</td>
+    </tr>`;
+  }
+  return `
+  <div style="margin-bottom:20px;">
+    <div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:${color};margin-bottom:10px;">
+      MASA MOLAR DE  <strong style="font-size:15px">${c.coef > 1 ? c.coef : ''}${c.formula}</strong>
+      <span style="color:var(--muted);font-size:10px;margin-left:6px;">[${c.side}]</span>
+    </div>
+    <table class="molar-table">
+      <thead><tr>
+        <th>Elemento</th>
+        <th>Peso atómico</th>
+        <th>Subíndice</th>
+        <th>Contribución</th>
+      </tr></thead>
+      <tbody>
+        ${rows}
+        <tr class="total-row">
+          <td colspan="3">Masa molar total de ${c.formula}</td>
+          <td>${mm.toFixed(4)} g/mol</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// 10. RENDER STEPS
+// ═══════════════════════════════════════════════════════
+function renderSteps(cK, cU, mmK, mmU, masaRaw, unidad, masaG, molesK, molesU, masaU_g) {
+  const div = document.getElementById('steps-container');
+
+  const step = (num, label, html) => `
+  <div class="step">
+    <div class="step-num">${num}</div>
+    <div class="step-body">
+      <div class="step-label">${label}</div>
+      <div class="step-formula">${html}</div>
+    </div>
+  </div>`;
+
+  let html = '';
+
+  // Paso 1: Conversión a gramos
+  const convHtml = unidad === 'kg'
+    ? `<span class="hl-orange">${masaRaw} kg</span> × <span class="hl-muted">1000 g/kg</span> = <span class="hl-cyan">${masaG.toFixed(4)} g</span>`
+    : `<span class="hl-orange">${masaRaw} g</span> <span class="hl-muted">(ya en gramos)</span>`;
+  html += step('1', 'Convertir la masa a gramos', convHtml);
+
+  // Paso 2: Moles del conocido
+  html += step('2', `Calcular moles de ${cK.formula} (conocido)`,
+    `n = <span class="hl-muted">masa / Masa molar</span><br>` +
+    `n = <span class="hl-orange">${masaG.toFixed(4)} g</span> ÷ <span class="hl-green">${mmK.toFixed(4)} g/mol</span><br>` +
+    `n<sub>${cK.formula}</sub> = <span class="hl-cyan">${molesK.toFixed(6)} mol</span>`
+  );
+
+  // Paso 3: Relación molar
+  html += step('3', 'Aplicar relación estequiométrica (razón de moles)',
+    `<span class="hl-muted">De la ecuación:</span>  ` +
+    `<span class="hl-orange">${cK.coef} mol ${cK.formula}</span>  ←→  <span class="hl-cyan">${cU.coef} mol ${cU.formula}</span><br><br>` +
+    `n<sub>${cU.formula}</sub> = n<sub>${cK.formula}</sub> × ` +
+    `<span class="hl-green">(${cU.coef} / ${cK.coef})</span><br>` +
+    `n<sub>${cU.formula}</sub> = <span class="hl-orange">${molesK.toFixed(6)}</span> × ` +
+    `<span class="hl-green">${(cU.coef / cK.coef).toFixed(6)}</span><br>` +
+    `n<sub>${cU.formula}</sub> = <span class="hl-cyan">${molesU.toFixed(6)} mol</span>`
+  );
+
+  // Paso 4: Masa del desconocido
+  html += step('4', `Calcular masa de ${cU.formula} (desconocido)`,
+    `masa = <span class="hl-muted">moles × Masa molar</span><br>` +
+    `masa = <span class="hl-orange">${molesU.toFixed(6)} mol</span> × <span class="hl-green">${mmU.toFixed(4)} g/mol</span><br>` +
+    `masa<sub>${cU.formula}</sub> = <span class="hl-cyan">${masaU_g.toFixed(6)} g</span>` +
+    ` = <span class="hl-green">${(masaU_g/1000).toFixed(8)} kg</span>`
+  );
+
+  div.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
+// 11. RENDER ANSWER
+// ═══════════════════════════════════════════════════════
+function renderAnswer(cU, masaG, masaKg, moles, unidadOrigen) {
+  const box = document.getElementById('answer-box');
+  const valG  = masaG.toFixed(4);
+  const valKg = masaKg.toFixed(7);
+  box.innerHTML = `
+    <div class="answer-label">Masa calculada de</div>
+    <div class="answer-formula">${cU.coef > 1 ? cU.coef : ''}${cU.formula}  ·  ${cU.side}</div>
+    <div class="answer-value">${valG}<span class="answer-unit">g</span></div>
+    <div style="font-size:16px;color:var(--muted);margin:6px 0 4px;font-family:var(--mono)">≡</div>
+    <div class="answer-value" style="font-size:clamp(18px,3vw,28px);">${valKg}<span class="answer-unit" style="font-size:14px">kg</span></div>
+    <div class="answer-sub">moles obtenidos: ${moles.toFixed(6)} mol</div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// UTIL
+// ═══════════════════════════════════════════════════════
+function showErr(el, msg) {
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// Enter en el input
+document.getElementById('eq-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') parsearEcuacion();
+});
+</script>
+</body>
+</html>

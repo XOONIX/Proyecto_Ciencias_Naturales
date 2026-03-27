@@ -1,26 +1,136 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MRU y MRA</title>
+    <title>Química y Física - Guía de Estudio</title>
+    <style>
+        /* Estilos Base */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 { margin: 0; font-size: 1.8rem; }
+
+        /* Contenedor del Menú */
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Tarjetas Dinámicas */
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-left: 5px solid #2a5298;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #1e3c72;
+            font-size: 1.4rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: #666;
+            flex-grow: 1;
+        }
+
+        /* Botones Prácticos */
+        .btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #2a5298;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #1e3c72;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.8rem;
+            color: #888;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Hoy veremos el movimiento rectilineo acelerado y uniforme </h1>
+    <header>
+        <h1>Física y Química</h1>
+        <p>Selecciona un tema para comenzar a practicar</p>
+    </header>
 
-    <h2>Movimiento Rectilineo Uniforme</h2>
+    <div class="menu-container">
+        <!-- Tarjeta 1 -->
+        <article class="card">
+            <h2>Movimiento Rectilíneo Uniforme</h2>
+            <p>Es aquel en el que un objeto se desplaza en línea recta, manteniendo una velocidad constante (sin aceleración). Esto significa que recorre distancias iguales en intervalos de tiempo iguales.</p>
+            <a href="mru.html" class="btn">Realizar Ejercicios</a>
+        </article>
 
-    <p>Es aquel en el que un objeto se desplaza en línea recta, manteniendo una velocidad constante (sin aceleración). Esto significa que recorre distancias iguales en intervalos de tiempo iguales. </p>
-    <p></p>
+        <!-- Tarjeta 2 -->
+        <article class="card">
+            <h2>Movimiento Rectilíneo Acelerado</h2>
+            <p>Es aquel en el que un objeto se desplaza en línea recta y cambia su velocidad a un ritmo constante. Esto significa que la aceleración es constante (no cambia) y diferente de cero.</p>
+            <a href="mra.html" class="btn">Realizar Ejercicios</a>
+        </article>
 
-    <h2>Movimiento Rectilineo Acelerado</h2> 
+        <!-- Tarjeta 3 -->
+        <article class="card">
+            <h2>Tanteo de Ecuaciones</h2>
+            <p>Es una técnica que se utiliza para resolver problemas de física, especialmente en el estudio del movimiento. Consiste en probar diferentes ecuaciones y fórmulas hasta encontrar la que se ajusta a los datos del problema. Es como un proceso de ensayo y error para descubrir cuál es la ecuación correcta que describe el fenómeno físico en cuestión.</p>
+            <a href="tanteo.html" class="btn">Realizar Ejercicios</a>
+        </article>
 
-    <p>Es aquel en el que un objeto se desplaza en línea recta y cambia su velocidad a un ritmo constante. Esto significa que la aceleración es constante (no cambia) y diferente de cero. </p>
-    <p></p>
+        <!-- Tarjeta 4 -->
+        <article class="card">
+            <h2>Estequiometría</h2>
+            <p>Es la parte de la química que se encarga de estudiar las relaciones cuantitativas entre los reactivos y los productos en una reacción química. Permite determinar las cantidades de sustancias necesarias para llevar a cabo una reacción o para predecir las cantidades de productos que se formarán a partir de ciertas cantidades de reactivos.</p>
+            <a href="estequiometria.html" class="btn">Realizar Ejercicios</a>
+        </article>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Aron Quintana & Johnny Cardozo</p>
+    </footer>
 </body>
-
-<footer>
-
-</footer>
 </html>

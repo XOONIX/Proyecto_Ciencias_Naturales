@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprendiendo M.R.U.</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: auto; padding: 20px; background-color: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1, h2 { color: #2c3e50; }
+        .formula { font-size: 1.5em; text-align: center; background: #e8f4fd; padding: 10px; border-radius: 5px; color: #007bff; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #218838; }
+        .resultado { margin-top: 15px; font-weight: bold; color: #d9534f; }
+    </style>
+</head>
+<body>
+
+    <h1>Movimiento Rectilíneo Uniforme (M.R.U.)</h1>
+
+    <div class="card">
+        <h2>¿Qué es el M.R.U.?</h2>
+        <p>Es cuando un objeto se desplaza en <strong>línea recta</strong> a una <strong>velocidad constante</strong>. Esto significa que recorre distancias iguales en tiempos iguales y su aceleración es cero.</p>
+    </div>
+
+    <div class="card">
+        <h2>La Fórmula Mágica</h2>
+        <div class="formula">d = v · t</div>
+        <p>Donde:</p>
+        <ul>
+            <li><strong>d:</strong> Distancia (metros)</li>
+            <li><strong>v:</strong> Velocidad (m/s)</li>
+            <li><strong>t:</strong> Tiempo (segundos)</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Calculadora de Ejercicios</h2>
+        <p>Deja vacío el campo que quieras calcular:</p>
+        <div>
+            <label>Distancia (m):</label> <input type="number" id="distancia" placeholder="Ej: 100"><br>
+            <label>Velocidad (m/s):</label> <input type="number" id="velocidad" placeholder="Ej: 20"><br>
+            <label>Tiempo (s):</label> <input type="number" id="tiempo" placeholder="Ej: 5"><br>
+            <button onclick="calcular()">Calcular Incógnita</button>
+        </div>
+        <div id="res" class="resultado"></div>
+    </div>
+
+    <script>
+        function calcular() {
+            let d = document.getElementById('distancia').value;
+            let v = document.getElementById('velocidad').value;
+            let t = document.getElementById('tiempo').value;
+            let res = document.getElementById('res');
+
+            if (!d && v && t) {
+                res.innerText = "Distancia = " + (v * t) + " metros";
+            } else if (d && !v && t) {
+                res.innerText = "Velocidad = " + (d / t).toFixed(2) + " m/s";
+            } else if (d && v && !t) {
+                res.innerText = "Tiempo = " + (d / v).toFixed(2) + " segundos";
+            } else {
+                res.innerText = "Por favor, llena exactamente dos campos.";
+            }
+        }
+    </script>
+
+</body>
+</html>

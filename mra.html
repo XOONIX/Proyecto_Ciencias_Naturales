@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.R.U.A. Inteligente</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            color: #333;
+        }
+        .container { width: 100%; max-width: 700px; }
+        h1 { text-align: center; color: #2c3e50; }
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h2 { margin-top: 0; font-size: 1.3rem; color: #1a73e8; }
+        .formula-box {
+            background-color: #e8f0fe;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 5px;
+            color: #1967d2;
+            margin: 15px 0;
+        }
+        .input-group { margin-bottom: 12px; }
+        label { display: inline-block; width: 220px; font-weight: 500; }
+        input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 150px; }
+        
+        .btn-green {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .btn-green:hover { background-color: #218838; }
+        
+        #resultado {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #d93025;
+            font-size: 1.2rem;
+        }
+        .instruccion { font-style: italic; color: #666; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Movimiento Rectilíneo Uniformemente Acelerado (M.R.U.A.)</h1>
+
+    <!-- Explicación -->
+    <div class="card">
+        <h2>¿Qué es el M.R.U.A.?</h2>
+        <p>Es cuando un objeto se desplaza en línea recta y su velocidad cambia de manera constante debido a una <strong>aceleración</strong> que no varía.</p>
+    </div>
+
+    <!-- Fórmulas -->
+    <div class="card">
+        <h2>La Fórmula Mágica</h2>
+        <div class="formula-box">
+            1. Velocidad Final (sin distancia):
+            vf = v0 + a * t <br>
+            2. Distancia (sin velocidad final):
+            d = v0 * t + 0.5 * a * t^2 <br>
+            3. Velocidad Final (sin tiempo):
+            vf^2 = v0^2 + 2 * a * d <br>
+            4. Distancia (sin aceleración):
+            d = ((v0 + vf) / 2) * t <br> 
+            5. Aceleración:
+            a = (vf - v0) / t <br>
+            6. Tiempo:
+            t = (vf - v0) / a <br>
+        </div>
+    </div>
+
+    <!-- Calculadora Única -->
+    <div class="card">
+        <h2>Calculadora de Ejercicios</h2>
+        <p class="instruccion">Deja vacío el campo que quieras calcular (necesitas al menos 3 datos):</p>
+        
+        <div class="input-group">
+            <label>Distancia (m):</label>
+            <input type="number" id="d" step="any">
+        </div>
+        <div class="input-group">
+            <label>Velocidad Inicial (v₀) (m/s):</label>
+            <input type="number" id="v0" step="any">
+        </div>
+        <div class="input-group">
+            <label>Velocidad Final (v_f) (m/s):</label>
+            <input type="number" id="vf" step="any">
+        </div>
+        <div class="input-group">
+            <label>Aceleración (a) (m/s²):</label>
+            <input type="number" id="a" step="any">
+        </div>
+        <div class="input-group">
+            <label>Tiempo (t) (s):</label>
+            <input type="number" id="t" step="any">
+        </div>
+
+        <button class="btn-green" onclick="calcularIncognita()">Calcular Incógnita</button>
+
+        <div id="resultado"></div>
+    </div>
+</div>
+
+<script>
+    function calcularIncognita() {
+        // Obtener valores (si están vacíos serán NaN)
+        let d = parseFloat(document.getElementById('d').value);
+        let v0 = parseFloat(document.getElementById('v0').value);
+        let vf = parseFloat(document.getElementById('vf').value);
+        let a = parseFloat(document.getElementById('a').value);
+        let t = parseFloat(document.getElementById('t').value);
+        
+        let resText = "";
+        let resDiv = document.getElementById('resultado');
+
+        // Lógica de cálculo según el campo vacío
+        if (isNaN(d)) {
+            // Calcular Distancia d = v0*t + 0.5*a*t^2
+            if (!isNaN(v0) && !isNaN(a) && !isNaN(t)) {
+                d = (v0 * t) + (0.5 * a * t * t);
+                resText = "Distancia (d) = " + d.toFixed(2) + " metros";
+            } else if (!isNaN(v0) && !isNaN(vf) && !isNaN(t)) {
+                d = ((v0 + vf) / 2) * t;
+                resText = "Distancia (d) = " + d.toFixed(2) + " metros";
+            } else { resText = "Faltan datos para calcular d"; }
+        } 
+        else if (isNaN(vf)) {
+            // Calcular Velocidad Final vf = v0 + a*t
+            if (!isNaN(v0) && !isNaN(a) && !isNaN(t)) {
+                vf = v0 + (a * t);
+                resText = "Velocidad Final (v_f) = " + vf.toFixed(2) + " m/s";
+            } else { resText = "Faltan datos para calcular v_f"; }
+        }
+        else if (isNaN(v0)) {
+            // Calcular Velocidad Inicial v0 = vf - a*t
+            if (!isNaN(vf) && !isNaN(a) && !isNaN(t)) {
+                v0 = vf - (a * t);
+                resText = "Velocidad Inicial (v₀) = " + v0.toFixed(2) + " m/s";
+            } else { resText = "Faltan datos para calcular v₀"; }
+        }
+        else if (isNaN(a)) {
+            // Calcular Aceleración a = (vf - v0) / t
+            if (!isNaN(vf) && !isNaN(v0) && !isNaN(t) && t !== 0) {
+                a = (vf - v0) / t;
+                resText = "Aceleración (a) = " + a.toFixed(2) + " m/s²";
+            } else { resText = "Faltan datos o el tiempo es 0"; }
+        }
+        else if (isNaN(t)) {
+            // Calcular Tiempo t = (vf - v0) / a
+            if (!isNaN(vf) && !isNaN(v0) && !isNaN(a) && a !== 0) {
+                t = (vf - v0) / a;
+                resText = "Tiempo (t) = " + Math.abs(t).toFixed(2) + " segundos";
+            } else { resText = "Faltan datos o la aceleración es 0"; }
+        } else {
+            resText = "¡Todos los campos están llenos! Borra uno para calcularlo.";
+        }
+
+        resDiv.innerText = resText;
+    }
+</script>
+
+</body>
+</html>
