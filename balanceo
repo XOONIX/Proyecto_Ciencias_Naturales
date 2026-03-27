@@ -1,0 +1,64 @@
+
+
+print("""Que tipo de ecucion desea balancear?:
+      1. Mg + O2 → MgO
+      2. CH4 + O2 → CO2 + H2O
+      3. Al+ H2SO4 → Al2(SO4)3 + H2 
+       """)
+
+from sympy import symbols, Eq, solve
+
+class Ecuacion1:
+    def __init__(self):
+        self.elemento1 = ""
+        self.elemento2 = ""
+        self.elemento3 = ""
+        self.sub1 = 1
+        self.sub2 = 1
+        self.sub3_a = 1 # Subíndice del primer elemento en el producto
+        self.sub3_b = 1 # Subíndice del segundo elemento en el producto
+
+    def solicitarInfo(self):
+        self.elemento1 = input("Primer reactivo (Ej: Mg): ")
+        self.sub1 = int(input(f"Subíndice de {self.elemento1}: ") or 1)
+        self.elemento2 = input("Segundo reactivo (Ej: O): ")
+        self.sub2 = int(input(f"Subíndice de {self.elemento2}: ") or 1)
+        self.elemento3 = input("Producto (Ej: MgO): ")
+        # Para balancear necesitamos saber cuántos hay de cada uno en el producto
+        self.sub3_a = int(input(f"Subíndice de {self.elemento1} en {self.elemento3}: ") or 1)
+        self.sub3_b = int(input(f"Subíndice de {self.elemento2} en {self.elemento3}: ") or 1)
+        
+        if self.sub1 == 0:
+            self.sub1 = 1
+        if self.sub2 == 0:
+            self.sub2 = 1
+        if self.sub3_a == 0:
+            self.sub3_a = 1
+        if self.sub3_b == 0:
+            self.sub3_b = 1
+
+
+    def balancear(self):
+        a, b, c = symbols('a b c')
+        # Ecuaciones basadas en los subíndices ingresados
+        # Reactivos = Productos
+        ecuaciones = [
+            Eq(a * self.sub1, c * self.sub3_a),
+            Eq(b * self.sub2, c * self.sub3_b)
+        ]
+        
+        sol = solve(ecuaciones, (a, b))
+        
+        # Probar un valor para c que elimine fracciones (simplificado)
+        c_val = 2 
+        a_val = sol[a].subs(c, c_val)
+        b_val = sol[b].subs(c, c_val)
+
+        print(f"\nResultado: {a_val}{self.elemento1} + {b_val}{self.elemento2} → {c_val}{self.elemento3}")
+
+opcion = int(input("¿Qué tipo de ecuación desea balancear? (1, 2, 3): "))
+
+if opcion == 1:
+    mi_ecuacion = Ecuacion1() # Instancia correcta
+    mi_ecuacion.solicitarInfo()
+    mi_ecuacion.balancear()

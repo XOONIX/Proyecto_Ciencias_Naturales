@@ -1,0 +1,102 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNO/KNgEW0mQ25bDirDQXEq",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/XOONIX/Proyecto_Ciencias_Naturales/blob/main/QUIMICA\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "uIFxCxYnN43S"
+      },
+      "outputs": [],
+      "source": [
+        "def menu_principal():\n",
+        "    print(\"\\n--- CALCULADORA DE FÍSICA ---\")\n",
+        "    print(\"1. Movimiento Rectilíneo Uniforme (MRU)\")\n",
+        "    print(\"2. Movimiento Rectilíneo Uniformemente Acelerado (MRUA)\")\n",
+        "    print(\"3. Salir\")\n",
+        "    return input(\"Selecciona una opción: \")\n",
+        "\n",
+        "def ejecutar_mru():\n",
+        "    print(\"\\n[ MRU: d = v * t ]\")\n",
+        "    print(\"Si no conoces el valor solo (presiona Enter) escribe la variable que quieres calcular.\")\n",
+        "\n",
+        "    try:\n",
+        "        d = input(\"Distancia (m): \")\n",
+        "        v = input(\"Velocidad (m/s): \")\n",
+        "        t = input(\"Tiempo (s): \")\n",
+        "\n",
+        "        if not d: # Calcular distancia\n",
+        "            res = float(v) * float(t)\n",
+        "            print(f\">> La Distancia es: {res} m\")\n",
+        "        elif not v: # Calcular velocidad\n",
+        "            res = float(d) / float(t)\n",
+        "            print(f\">> La Velocidad es: {res} m/s\")\n",
+        "        elif not t: # Calcular tiempo\n",
+        "            res = float(d) / float(v)\n",
+        "            print(f\">> El Tiempo es: {res} s\")\n",
+        "    except ValueError:\n",
+        "        print(\"Error: Ingresa solo números válidos.\")\n",
+        "    except ZeroDivisionError:\n",
+        "        print(\"Error: El tiempo o la velocidad no pueden ser cero.\")\n",
+        "\n",
+        "def ejecutar_mrua():\n",
+        "    print(\"\\n[ MRUA: vf = vi + a*t  |  d = vi*t + 0.5*a*t^2 ]\")\n",
+        "    print(\"1. Calcular Velocidad Final (vf)\")\n",
+        "    print(\"2. Calcular Distancia (d)\")\n",
+        "    opcion = input(\"¿Qué deseas calcular?: \")\n",
+        "\n",
+        "    try:\n",
+        "        vi = float(input(\"Velocidad inicial (m/s): \"))\n",
+        "        a = float(input(\"Aceleración (m/s²): \"))\n",
+        "        t = float(input(\"Tiempo (s): \"))\n",
+        "\n",
+        "        if opcion == \"1\":\n",
+        "            vf = vi + (a * t)\n",
+        "            print(f\">> La Velocidad Final es: {vf} m/s\")\n",
+        "        elif opcion == \"2\":\n",
+        "            d = (vi * t) + (0.5 * a * (t**2))\n",
+        "            print(f\">> La Distancia recorrida es: {d} m\")\n",
+        "    except ValueError:\n",
+        "        print(\"Error: Por favor ingresa datos numéricos.\")\n",
+        "\n",
+        "# Bucle principal\n",
+        "while True:\n",
+        "    opc = menu_principal()\n",
+        "    if opc == \"1\":\n",
+        "        ejecutar_mru()\n",
+        "    elif opc == \"2\":\n",
+        "        ejecutar_mrua()\n",
+        "    elif opc == \"3\":\n",
+        "        print(\"¡Hasta luego!\")\n",
+        "        break\n",
+        "    else:\n",
+        "        print(\"Opción no válida.\")\n"
+      ]
+    }
+  ]
+}
