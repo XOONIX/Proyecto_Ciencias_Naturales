@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balanceador Químico</title>
+    <style>
+        /* Estilos Generales */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fc; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; color: #444; }
+        .card { background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 550px; margin-bottom: 25px; }
+        
+        h1 { color: #5a67d8; text-align: center; margin-bottom: 1rem; font-weight: 700; }
+        p.sub { text-align: center; color: #718096; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        
+        /* Inputs y Botón Principal */
+        input { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 10px; font-size: 16px; box-sizing: border-box; transition: border-color 0.3s; }
+        input:focus { outline: none; border-color: #a3bffa; }
+        
+        .btn-primary { width: 100%; padding: 14px; background: #667eea; color: white; border: none; border-radius: 10px; margin-top: 15px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background 0.3s; }
+        .btn-primary:hover { background: #5a67d8; }
+
+        /* Resultados */
+        .result { margin-top: 25px; padding: 20px; border-radius: 12px; display: none; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .success { background: #ebf4ff; border-left: 5px solid #667eea; display: block; }
+        .error { background: #fff5f5; border-left: 5px solid #feb2b2; display: block; }
+        
+        .formula { font-weight: bold; color: #4c51bf; font-size: 1.4rem; text-align: center; margin: 15px 0; letter-spacing: 1px; }
+        table { width: 100%; margin-top: 15px; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #edf2f7; }
+        th { background: #f7fafc; color: #718096; text-transform: uppercase; font-size: 0.8rem; }
+
+        /* EL BOTÓN PASTEL (ENLACE INFERIOR) */
+        .promo-link { text-decoration: none; color: inherit; width: 100%; max-width: 550px; display: block; }
+        .promo-card {
+            background-color: #e0d7ff; /* Morado Pastel */
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        .promo-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+            background-color: #d6ccff;
+        }
+        .promo-card h4 { margin: 0 0 5px 0; color: #5542a1; font-size: 1.1rem; }
+        .promo-card p { margin: 0; color: #6b5fb3; font-size: 0.9rem; opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>⚗️ Balanceador Químico</h1>
+    <p class="sub">Escribe tu ecuación, ejemplo: <code>CH4 + O2 -> CO2 + H2O</code></p>
+    
+    <input type="text" id="inputEcuacion" placeholder="Introduce la ecuación...">
+    <button class="btn-primary" onclick="procesar()">Balancear Ecuación</button>
+
+    <div id="resultadoBox" class="result">
+        <div id="mensaje" style="font-weight: bold;"></div>
+        <div id="ecuacionFinal" class="formula"></div>
+        <table id="tablaDetalle"></table>
+    </div>
+</div>
+
+<!-- Botón Estilo Pastel Mejorado -->
+<a href="estequiometria.html" class="promo-link">
+    <div class="promo-card">
+        <h4>Continuar a Estequiometría</h4>
+        <p>¿Quieres realizar cálculos avanzados con estos datos?</p>
+    </div>
+</a>
+
+<script>
+// (Misma lógica de procesamiento que tenías)
+function parsearFormula(formula) {
+    const regex = /([A-Z][a-z]?)(\d*)/g;
+    let elementos = {};
+    let m;
+    while ((m = regex.exec(formula)) !== null) {
+        let [_, elem, cant] = m;
+        elementos[elem] = (elementos[elem] || 0) + (cant ? parseInt(cant) : 1);
+    }
+    return elementos;
+}
+
+function obtenerConteo(compuestos, coefs) {
+    let conteo = {};
+    compuestos.forEach((f, i) => {
+        let elms = parsearFormula(f);
+        for (let e in elms) {
+            conteo[e] = (conteo[e] || 0) + (elms[e] * coefs[i]);
+        }
+    });
+    return conteo;
+}
+
+function sonIguales(obj1, obj2) {
+    const keys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
+    for (let k of keys) if (obj1[k] !== obj2[k]) return false;
+    return true;
+}
+
+function balancear(reactivos, productos) {
+    const nR = reactivos.length;
+    const nP = productos.length;
+    const total = nR + nP;
+    const max = 10;
+    let coefs = new Array(total).fill(1);
+    
+    while (true) {
+        let cR = coefs.slice(0, nR);
+        let cP = coefs.slice(nR);
+        if (sonIguales(obtenerConteo(reactivos, cR), obtenerConteo(productos, cP))) return { cR, cP };
+        let i = 0;
+        while (i < total) {
+            coefs[i]++;
+            if (coefs[i] <= max) break;
+            coefs[i] = 1;
+            i++;
+        }
+        if (i === total) return null;
+    }
+}
+
+function procesar() {
+    const raw = document.getElementById('inputEcuacion').value.replace(/\s+/g, '');
+    const box = document.getElementById('resultadoBox');
+    const msg = document.getElementById('mensaje');
+    const final = document.getElementById('ecuacionFinal');
+    const tabla = document.getElementById('tablaDetalle');
+
+    try {
+        if (!raw.includes('->')) throw "Usa '->' para separar la ecuación.";
+        let [izq, der] = raw.split('->');
+        let reactivos = izq.split('+');
+        let productos = der.split('+');
+        let sol = balancear(reactivos, productos);
+
+        if (!sol) {
+            box.className = "result error";
+            msg.innerText = "❌ No se encontró balance en el rango.";
+            final.innerText = "";
+            tabla.innerHTML = "";
+        } else {
+            box.className = "result success";
+            msg.innerText = "✅ ¡Ecuación Balanceada!";
+            final.innerText = sol.cR.map((c, i) => (c > 1 ? c : '') + reactivos[i]).join(' + ') + 
+                         " → " + 
+                         sol.cP.map((c, i) => (c > 1 ? c : '') + productos[i]).join(' + ');
+            let cIz = obtenerConteo(reactivos, sol.cR);
+            let cDe = obtenerConteo(productos, sol.cP);
+            let html = `<tr><th>Elemento</th><th>Reactivos</th><th>Productos</th></tr>`;
+            for (let e in cIz) html += `<tr><td>${e}</td><td>${cIz[e]}</td><td>${cDe[e]}</td></tr>`;
+            tabla.innerHTML = html;
+        }
+    } catch (e) {
+        box.className = "result error";
+        msg.innerText = "⚠️ Error: " + e;
+    }
+}
+</script>
+
+</body>
+</html>
